@@ -1,0 +1,10 @@
+dofile("/usr/local/share/quickshell-greeter/desktop.lua")
+hl.on("hyprland.start", function()
+  hl.exec_cmd('"${XDG_CONFIG_HOME:-$HOME/.config}/quickshell/scripts/session-start"')
+end)
+
+--hl.on("hyprland.start", function ()
+--  hl.exec_cmd("uwsm app -- waybar")
+--  hl.exec_cmd("uwsm app -- hypridle")
+--  hl.exec_cmd("systemctl --user start hyprpolkitagent.service")
+--end)
