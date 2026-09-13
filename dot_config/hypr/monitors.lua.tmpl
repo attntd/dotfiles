@@ -1,0 +1,7 @@
+{{- if eq .machine "p16" -}}
+{{ template "monitors/p16.lua" . }}
+{{- else if eq .machine "x1" -}}
+{{ template "monitors/x1.lua" . }}
+{{- else -}}
+{{ fail "Ustaw machine na p16 albo x1 w konfiguracji chezmoi" }}
+{{- end -}}

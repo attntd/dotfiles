@@ -1,0 +1,113 @@
+# Narzędzia instalacji, pobierania i kompilacji.
+git
+chezmoi
+base-devel
+cmake
+pkgconf
+bash
+coreutils
+sed
+grep
+gawk
+findutils
+diffutils
+util-linux
+curl
+wget
+tar
+unzip
+gzip
+
+# Powłoka, terminal, edytor i menedżer plików.
+fish
+starship
+openssh
+kitty
+neovim
+yazi
+tmux
+ripgrep
+fd
+fzf
+tree-sitter-cli
+
+# Narzędzia używane przez konfigurację Neovima.
+nodejs
+npm
+ruby
+ruby-bundler
+lua-language-server
+ruby-lsp
+tailwindcss-language-server
+
+# Czcionki Kitty/Quickshella i dźwięk powiadomień.
+fontconfig
+ttf-cascadia-code-nerd
+ttf-jetbrains-mono-nerd
+noto-fonts
+noto-fonts-emoji
+sound-theme-freedesktop
+
+# Hyprland, sesja Wayland i integracja aplikacji.
+hyprland
+hypridle
+hyprlock
+uwsm
+wayland
+wayland-protocols
+xorg-xwayland
+xdg-desktop-portal-hyprland
+xdg-desktop-portal-gtk
+qt6ct
+
+# Quickshell oraz biblioteki potrzebne do zbudowania własnych modułów.
+quickshell
+qt6-base
+qt6-declarative
+qt6-wayland
+qt6-svg
+qt6-multimedia
+python
+python-dbus
+glib2
+dbus
+systemd
+polkit
+pam
+pambase
+
+# Dźwięk, sieć, Bluetooth, bateria i zasilanie.
+pipewire
+pipewire-pulse
+pipewire-alsa
+wireplumber
+networkmanager
+bluez
+bluez-utils
+upower
+power-profiles-daemon
+
+# Pomocniki pulpitu, schowek, zrzuty i dyktowanie.
+wl-clipboard
+cliphist
+file
+brightnessctl
+xdg-utils
+libnotify
+jq
+satty
+wtype
+
+# Podglądy plików w Yazi.
+ffmpeg
+7zip
+poppler
+resvg
+imagemagick
+
+# Zależności osobnego instalatora ekranu logowania.
+# Instalacja tych pakietów nie konfiguruje greetd ani odcisków palców.
+greetd
+greetd-agreety
+rust
+fprintd

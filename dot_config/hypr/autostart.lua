@@ -1,6 +1,5 @@
-dofile("/usr/local/share/quickshell-greeter/desktop.lua")
 hl.on("hyprland.start", function()
-  hl.exec_cmd('"${XDG_CONFIG_HOME:-$HOME/.config}/quickshell/scripts/session-start"')
+  hl.exec_cmd("uwsm app -- qs -n -d")
 end)
 
 --hl.on("hyprland.start", function ()

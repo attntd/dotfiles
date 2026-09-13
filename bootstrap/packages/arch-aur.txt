@@ -1,0 +1,3 @@
+# Programy wywoływane przez skróty w konfiguracji Hyprlanda.
+zen-browser-bin
+voxtype-bin

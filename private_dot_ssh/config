@@ -16,5 +16,5 @@ Host security
 Host mediarr
   HostName 192.168.0.50
 
-Host radiodev radiology
+Host radiodev radiology technitium-1 technitium-2 security mediarr pve p16 x1
   User attntd
