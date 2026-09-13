@@ -6,8 +6,8 @@ hl.monitor({
 })
 
 hl.monitor({
-    output   = "HDMI-A-2",
-    mode     = "desc:LG Electronics LG ULTRAGEAR 409NTQD0X956",
+    output   = "desc:LG Electronics LG ULTRAGEAR 409NTQD0X956",
+    mode     = "2560x1440@143.99100",
     position = "4096x0",
     scale    = "1",
 })
