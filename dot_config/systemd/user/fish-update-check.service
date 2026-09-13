@@ -1,0 +1,7 @@
+[Unit]
+Description=Check for Arch Linux and AUR updates
+
+[Service]
+Type=oneshot
+ExecStart=/home/attntd/.local/bin/update-check-cache
+TimeoutStartSec=10min
