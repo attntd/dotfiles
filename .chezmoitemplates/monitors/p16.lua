@@ -13,7 +13,7 @@ hl.monitor({
 })
 
 hl.monitor({
-    output   = "desc:AU Optronics B160UAN06.N 0x00002BB4",
+    output   = "desc:AU Optronics B160UAN06.N  0x00002BB4",
     mode     = "1920x1200@60.09600",
     position = "4196x1440",
     scale    = "1",
@@ -21,7 +21,7 @@ hl.monitor({
 
 hl.workspace_rule({
   workspace   = "1",
-  monitor     = "desc:AU Optronics B160UAN06.N 0x00002BB4",
+  monitor     = "desc:AU Optronics B160UAN06.N  0x00002BB4",
   default     = true,
   persistent  = true,
 })
