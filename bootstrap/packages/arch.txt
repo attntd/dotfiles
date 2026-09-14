@@ -2,6 +2,7 @@
 git
 chezmoi
 base-devel
+pacman-contrib
 cmake
 pkgconf
 bash
@@ -82,6 +83,7 @@ pipewire-pulse
 pipewire-alsa
 wireplumber
 networkmanager
+firewalld
 bluez
 bluez-utils
 upower
