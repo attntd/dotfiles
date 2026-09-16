@@ -8,7 +8,7 @@
 
 return {
     ["kitty"] = "SUPER + RETURN",
-    ["zen-browser"] = "SUPER + B",
+    ["zen-browser"] = "SUPER + SHIFT + RETURN",
 
     file_manager = {
         command = "kitty -e fish -lc yazi",
