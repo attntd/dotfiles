@@ -91,7 +91,6 @@ function M.setup(bindings)
     bind(main_mod .. " + S", hl.dsp.layout("togglesplit"), { description = "[Layout] Toggle split" }, "toggle split")
 
     bind(main_mod .. " + N", hl.dsp.exec_cmd("qs ipc call notifications toggle"), { description = "[Notifications] Toggle center" }, "toggle notification center")
-    bind(main_mod .. " + SHIFT + N", hl.dsp.exec_cmd("qs ipc call notifications toggleDnd"), { description = "[Notifications] Toggle do not disturb" }, "toggle do not disturb")
 
     bind(main_mod .. " + SHIFT + L", hl.dsp.exec_cmd(lock_command), { description = "[Session] Lock screen" }, "lock screen")
 

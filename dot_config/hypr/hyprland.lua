@@ -11,6 +11,9 @@ local bindings = require("modules.bindings")
 bindings.commands(require("keybinds"))
 -- Window, workspace, mouse and hardware shortcuts.
 require("modules.system_binds").setup(bindings)
+-- QuickShell menus: Super+Shift+P/N/B/Q.
+local qs_config = os.getenv("XDG_CONFIG_HOME") or (os.getenv("HOME") .. "/.config")
+dofile(qs_config .. "/quickshell/config/menu-keybinds.lua")(bindings.bind)
 
 -------------------
 ---- AUTOSTART ----
