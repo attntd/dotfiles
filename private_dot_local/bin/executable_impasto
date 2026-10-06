@@ -1,0 +1,180 @@
+#!/usr/bin/env python3
+"""Run Impasto for this session; keep Putkin as the normal login shell."""
+import fcntl
+import json
+import os
+from pathlib import Path
+import signal
+import subprocess
+import sys
+import time
+
+BASE = Path.home() / '.local/share/impasto'
+SHELL = BASE / 'shell/shell.qml'
+PUTKIN = Path.home() / '.config/quickshell/shell.qml'
+RUNTIME = Path(os.environ.get('XDG_RUNTIME_DIR', f'/run/user/{os.getuid()}'))
+SESSION = RUNTIME / 'impasto-test.json'
+ENV = {k: v for k, v in os.environ.items() if k not in ('QS_CONFIG_PATH', 'QS_CONFIG_NAME', 'QS_MANIFEST')}
+
+
+def run(*args, check=True):
+    return subprocess.run(list(map(str, args)), env=ENV, text=True, capture_output=True, check=check, timeout=30)
+
+
+def systemctl(*args, check=True):
+    return run('systemctl', '--user', *args, check=check)
+
+
+def instances():
+    result = run('/usr/bin/quickshell', 'list', '--all', '--json')
+    return [] if result.stdout.strip() == 'No running instances.' else json.loads(result.stdout or '[]')
+
+
+def instance(path):
+    return next((i for i in instances() if Path(i['config_path']).resolve() == path.resolve()), None)
+
+
+def status():
+    result = run('/usr/bin/quickshell', 'ipc', '--path', SHELL, 'call', 'impasto', 'status', check=False)
+    try:
+        return json.loads(result.stdout)
+    except ValueError:
+        return None
+
+
+def stop_helpers(unit, roots):
+    """Clean up shell backends without touching applications in the same unit."""
+    group = systemctl('show', unit, '-p', 'ControlGroup', '--value', check=False).stdout.strip()
+    if not group:
+        return
+    cgroup = Path('/sys/fs/cgroup') / group.lstrip('/')
+    for pids in cgroup.rglob('cgroup.procs'):
+        for value in pids.read_text().split():
+            try:
+                pid = int(value)
+                args = Path(f'/proc/{pid}/cmdline').read_bytes().decode().rstrip('\0').split('\0')
+                program = Path(args[0]).name
+                backend = any(any(arg.startswith(str(root) + '/') for root in roots) for arg in args[1:])
+                monitor = program == 'dbus-monitor' or (program == 'gdbus' and args[1:2] == ['monitor'])
+                inhibitor = program == 'systemd-inhibit' and '--who=impasto' in args
+                if monitor or inhibitor or (backend and program in ('python', 'python3', 'wl-paste')):
+                    os.kill(pid, signal.SIGTERM)
+            except (FileNotFoundError, ProcessLookupError):
+                pass
+
+
+def stop_putkin():
+    current = instance(PUTKIN)
+    if current is None:
+        return False
+    reply = run('/usr/bin/quickshell', 'ipc', '--path', PUTKIN, 'call', 'session', 'status')
+    lock = json.loads(reply.stdout).get('lock') or {}
+    if lock.get('locked'):
+        raise RuntimeError('Najpierw odblokuj ekran Putkin.')
+    main_pid = systemctl('show', 'putkin.service', '-p', 'MainPID', '--value', check=False).stdout.strip()
+    if main_pid == str(current['pid']):
+        # Chromium and other applications may be children in Putkin's unit.
+        # A normal stop would kill that entire cgroup. Restrict this stop to
+        # the shell process, then clean up only recognized shell helpers.
+        dropin = RUNTIME / 'systemd/user/putkin.service.d/90-impasto-test.conf'
+        if dropin.exists():
+            raise RuntimeError(f'Istnieje już {dropin}; nie nadpisuję go.')
+        dropin.parent.mkdir(parents=True, exist_ok=True)
+        try:
+            dropin.write_text('[Service]\nKillMode=process\nSendSIGKILL=no\nRestart=no\nTimeoutStopSec=2s\n')
+            systemctl('daemon-reload')
+            mode = systemctl('show', 'putkin.service', '-p', 'KillMode', '--value').stdout.strip()
+            if mode != 'process':
+                raise RuntimeError('Nie można zatrzymać Putkin z zachowaniem otwartych aplikacji.')
+            systemctl('stop', 'putkin.service')
+            stop_helpers('putkin.service', [PUTKIN.parent / 'services', PUTKIN.resolve().parent / 'services'])
+        finally:
+            state = systemctl('show', 'putkin.service', '-p', 'ActiveState', '--value', check=False).stdout.strip()
+            if state != 'deactivating':
+                dropin.unlink(missing_ok=True)
+                systemctl('daemon-reload')
+    else:
+        run('/usr/bin/quickshell', 'kill', '--id', current['id'])
+    return True
+
+
+def restore():
+    current = status()
+    if current and current.get('locked'):
+        raise RuntimeError('Najpierw odblokuj ekran Impasto.')
+    systemctl('stop', 'impasto.service', 'impasto-wallpaper.service')
+    stop_helpers('impasto.service', [SHELL.parent / 'scripts'])
+    run('hyprctl', 'reload')
+    saved = json.loads(SESSION.read_text()) if SESSION.exists() else {}
+    if saved.get('putkin_was_running') and not instance(PUTKIN):
+        # A transient unit with surviving application children is still
+        # loaded, so restart it instead of asking UWSM to create it again.
+        loaded = systemctl('show', 'putkin.service', '-p', 'LoadState', '--value', check=False).stdout.strip()
+        if loaded == 'loaded':
+            systemctl('start', 'putkin.service')
+        else:
+            run(Path.home() / '.local/bin/qs')
+        for _ in range(40):
+            if instance(PUTKIN):
+                break
+            time.sleep(0.25)
+        else:
+            raise RuntimeError('Impasto zatrzymane; Putkin nie wystartował. Uruchom qs.')
+    SESSION.unlink(missing_ok=True)
+    print('Impasto zatrzymane. Przywrócono poprzednią sesję.')
+
+
+def start():
+    if status():
+        print('Impasto już działa. Powrót do Putkin: impasto stop')
+        return
+    if SESSION.exists():
+        # Recover an interrupted/failed previous test before trying again.
+        restore()
+    had_putkin = instance(PUTKIN) is not None
+    saved = {'putkin_was_running': had_putkin}
+    SESSION.write_text(json.dumps(saved) + '\n')
+    SESSION.chmod(0o600)
+    try:
+        if had_putkin:
+            stop_putkin()
+        systemctl('start', 'impasto.service')
+        for _ in range(60):
+            if status():
+                print('Impasto działa. Ustawienia: Super+, | Powrót do Putkin: impasto stop')
+                return
+            if systemctl('is-failed', '--quiet', 'impasto.service', check=False).returncode == 0:
+                break
+            time.sleep(0.25)
+        raise RuntimeError('Impasto nie wystartowało; sprawdź journalctl --user -u impasto.service.')
+    except Exception:
+        restore()
+        raise
+
+
+def main():
+    action = sys.argv[1] if len(sys.argv) > 1 else 'start'
+    if action in ('-h', '--help', 'help'):
+        print('impasto [start|stop|status|settings|launcher]\nStart jest tymczasowy; stop przywraca Putkin. Autostart pozostaje bez zmian.')
+        return
+    if action == 'status':
+        print(json.dumps(status() or {'running': False}, ensure_ascii=False))
+        return
+    if action in ('settings', 'launcher'):
+        run('/usr/bin/quickshell', 'ipc', '--path', SHELL, 'call', 'impasto', action)
+        return
+    if action not in ('start', 'stop'):
+        raise RuntimeError(f'Nieznane polecenie: {action}')
+    with (RUNTIME / 'impasto-test.lock').open('w') as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        start() if action == 'start' else restore()
+
+
+if __name__ == '__main__':
+    try:
+        main()
+    except (OSError, RuntimeError, ValueError, subprocess.SubprocessError) as error:
+        print(f'impasto: {error}', file=sys.stderr)
+        if isinstance(error, subprocess.CalledProcessError):
+            print(error.stderr.strip(), file=sys.stderr)
+        sys.exit(1)

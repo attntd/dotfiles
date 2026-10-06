@@ -1,0 +1,5 @@
+[sftp.radiodev]
+host = "192.168.0.80"
+user = "attntd"
+port = 22
+key_file = "~/.ssh/id_ed25519"

@@ -1,0 +1,300 @@
+{
+  "schemaVersion": 1,
+  "bindings": [
+    {
+      "action": "launcher",
+      "shortcut": "SUPER + SPACE",
+      "command": ""
+    },
+    {
+      "action": "clipboard",
+      "shortcut": "SUPER + V",
+      "command": ""
+    },
+    {
+      "action": "commands",
+      "shortcut": "SUPER + semicolon",
+      "command": ""
+    },
+    {
+      "action": "messages",
+      "shortcut": "SUPER + CONTROL + SHIFT + Return",
+      "command": ":messages"
+    },
+    {
+      "action": "settings",
+      "shortcut": "",
+      "command": ":settings"
+    },
+    {
+      "action": "quickSettings",
+      "shortcut": "SUPER + Q",
+      "command": ""
+    },
+    {
+      "action": "audio",
+      "shortcut": "",
+      "command": ""
+    },
+    {
+      "action": "battery",
+      "shortcut": "",
+      "command": ""
+    },
+    {
+      "action": "bar",
+      "shortcut": "SUPER + B",
+      "command": ""
+    },
+    {
+      "action": "notifications",
+      "shortcut": "SUPER + SHIFT + N",
+      "command": ""
+    },
+    {
+      "action": "dnd",
+      "shortcut": "",
+      "command": ""
+    },
+    {
+      "action": "screenshot",
+      "shortcut": "Print",
+      "command": ":screenshot"
+    },
+    {
+      "action": "volumeUp",
+      "shortcut": "",
+      "command": ""
+    },
+    {
+      "action": "volumeDown",
+      "shortcut": "",
+      "command": ""
+    },
+    {
+      "action": "mute",
+      "shortcut": "",
+      "command": ""
+    },
+    {
+      "action": "micMute",
+      "shortcut": "",
+      "command": ""
+    },
+    {
+      "action": "brightnessUp",
+      "shortcut": "",
+      "command": ""
+    },
+    {
+      "action": "brightnessDown",
+      "shortcut": "",
+      "command": ""
+    },
+    {
+      "action": "powersaver",
+      "shortcut": "",
+      "command": ":powersaver"
+    },
+    {
+      "action": "balanced",
+      "shortcut": "",
+      "command": ":balanced"
+    },
+    {
+      "action": "performance",
+      "shortcut": "",
+      "command": ":performance"
+    },
+    {
+      "action": "power",
+      "shortcut": "SUPER + SHIFT + P",
+      "command": ""
+    },
+    {
+      "action": "lock",
+      "shortcut": "",
+      "command": ":lock"
+    },
+    {
+      "action": "shutdown",
+      "shortcut": "",
+      "command": ":shutdown"
+    },
+    {
+      "action": "poweroff",
+      "shortcut": "",
+      "command": ":poweroff"
+    },
+    {
+      "action": "sleep",
+      "shortcut": "",
+      "command": ":sleep"
+    },
+    {
+      "action": "hibernate",
+      "shortcut": "",
+      "command": ":hibernate"
+    },
+    {
+      "action": "reboot",
+      "shortcut": "",
+      "command": ":reboot"
+    },
+    {
+      "action": "closeWindow",
+      "shortcut": "",
+      "command": ""
+    },
+    {
+      "action": "floating",
+      "shortcut": "",
+      "command": ""
+    },
+    {
+      "action": "fullscreen",
+      "shortcut": "",
+      "command": ""
+    },
+    {
+      "action": "focusLeft",
+      "shortcut": "",
+      "command": ""
+    },
+    {
+      "action": "focusDown",
+      "shortcut": "",
+      "command": ""
+    },
+    {
+      "action": "focusUp",
+      "shortcut": "",
+      "command": ""
+    },
+    {
+      "action": "focusRight",
+      "shortcut": "",
+      "command": ""
+    },
+    {
+      "action": "moveLeft",
+      "shortcut": "",
+      "command": ""
+    },
+    {
+      "action": "moveDown",
+      "shortcut": "",
+      "command": ""
+    },
+    {
+      "action": "moveUp",
+      "shortcut": "",
+      "command": ""
+    },
+    {
+      "action": "moveRight",
+      "shortcut": "",
+      "command": ""
+    },
+    {
+      "action": "workspace1",
+      "shortcut": "",
+      "command": ""
+    },
+    {
+      "action": "moveWorkspace1",
+      "shortcut": "",
+      "command": ""
+    },
+    {
+      "action": "workspace2",
+      "shortcut": "",
+      "command": ""
+    },
+    {
+      "action": "moveWorkspace2",
+      "shortcut": "",
+      "command": ""
+    },
+    {
+      "action": "workspace3",
+      "shortcut": "",
+      "command": ""
+    },
+    {
+      "action": "moveWorkspace3",
+      "shortcut": "",
+      "command": ""
+    },
+    {
+      "action": "workspace4",
+      "shortcut": "",
+      "command": ""
+    },
+    {
+      "action": "moveWorkspace4",
+      "shortcut": "",
+      "command": ""
+    },
+    {
+      "action": "workspace5",
+      "shortcut": "",
+      "command": ""
+    },
+    {
+      "action": "moveWorkspace5",
+      "shortcut": "",
+      "command": ""
+    },
+    {
+      "action": "workspace6",
+      "shortcut": "",
+      "command": ""
+    },
+    {
+      "action": "moveWorkspace6",
+      "shortcut": "",
+      "command": ""
+    },
+    {
+      "action": "workspace7",
+      "shortcut": "",
+      "command": ""
+    },
+    {
+      "action": "moveWorkspace7",
+      "shortcut": "",
+      "command": ""
+    },
+    {
+      "action": "workspace8",
+      "shortcut": "",
+      "command": ""
+    },
+    {
+      "action": "moveWorkspace8",
+      "shortcut": "",
+      "command": ""
+    },
+    {
+      "action": "workspace9",
+      "shortcut": "",
+      "command": ""
+    },
+    {
+      "action": "moveWorkspace9",
+      "shortcut": "",
+      "command": ""
+    },
+    {
+      "action": "workspace10",
+      "shortcut": "",
+      "command": ""
+    },
+    {
+      "action": "moveWorkspace10",
+      "shortcut": "",
+      "command": ""
+    }
+  ]
+}

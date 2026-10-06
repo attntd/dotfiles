@@ -1,3 +1,9 @@
+# Pliki radiodev przez SSH/SFTP.
+[[mgr.prepend_keymap]]
+on = ["g", "r"]
+run = "cd sftp://radiodev//home/attntd"
+desc = "Radiodev: pliki przez SSH"
+
 # Quick Look: maksymalizuje lub przywraca panel podgladu.
 [[mgr.prepend_keymap]]
 on = "<Space>"
@@ -52,3 +58,9 @@ desc = "Otworz za pomoca..."
 on = "<A-h>"
 run = "hidden toggle"
 desc = "Pokaz/ukryj dotfiles"
+
+[[mgr.prepend_keymap]]
+on = "!"
+for = "unix"
+run = 'shell --block -- yazi_target=%h; if [ -d "$yazi_target" ]; then cd -- "$yazi_target" || exit; fi; exec "$SHELL"'
+desc = "Otworz powloke w folderze pod kursorem"

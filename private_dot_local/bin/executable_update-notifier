@@ -1,0 +1,144 @@
+#!/usr/bin/python3
+"""Notify about new repository/AUR updates without changing the system database."""
+import fcntl
+import json
+import os
+from pathlib import Path
+import re
+import subprocess
+import sys
+import tempfile
+import time
+
+
+def package_state():
+    database = Path("/var/lib/pacman/local").stat()
+    return database.st_mtime_ns, database.st_ctime_ns
+
+
+def wait_for_packages():
+    # Wait for an idle database and coalesce closely spaced transactions.
+    lock = Path("/var/lib/pacman/db.lck")
+    while True:
+        before = package_state()
+        if lock.exists():
+            time.sleep(2)
+            continue
+        time.sleep(2)
+        if not lock.exists() and before == package_state():
+            return before
+
+
+def atomic_write(path, text):
+    fd, temporary = tempfile.mkstemp(prefix=path.name + ".", dir=path.parent)
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as output:
+            output.write(text)
+            output.flush()
+            os.fsync(output.fileno())
+        os.replace(temporary, path)
+    finally:
+        if os.path.exists(temporary):
+            os.unlink(temporary)
+
+
+def scan(command, environment, previous, now, repository=False):
+    try:
+        result = subprocess.run(command, stdin=subprocess.DEVNULL,
+                                capture_output=True, text=True, errors="replace",
+                                env=environment, timeout=240)
+        lines = [line.strip() for line in result.stdout.splitlines() if line.strip()]
+        empty_success = not lines and (
+            (repository and result.returncode == 2) or
+            (not repository and result.returncode == 1 and not result.stderr.strip()))
+        if result.returncode != 0 and not empty_success:
+            raise RuntimeError(result.stderr.strip()[-1000:] or
+                               f"exit status {result.returncode}")
+        if any(not re.fullmatch(r"[A-Za-z0-9@._+\-]+\s+\S+\s+->\s+\S+", line)
+               for line in lines):
+            raise RuntimeError("unexpected update-list format")
+        return {"count": len(lines), "updates": lines, "checked_at": now, "error": None}
+    except (OSError, subprocess.TimeoutExpired, RuntimeError) as error:
+        count = previous.get("count", 0)
+        if not isinstance(count, int) or count < 0:
+            count = 0
+        return {"count": count, "updates": previous.get("updates", []),
+                "checked_at": previous.get("checked_at"), "error": str(error)}
+
+
+def notify_updates(results, previous):
+    # Remember target versions, not counts: installing a subset is not a new update.
+    known = set(previous.get("notified", []))
+    current = set()
+    for source, result in results.items():
+        for line in result["updates"]:
+            package, _installed, _arrow, target = line.split()
+            current.add(f"{source}:{package}:{target}")
+    fresh = current - known
+    if fresh:
+        repo, aur = results["repo"]["count"], results["aur"]["count"]
+        partial = any(value["error"] for value in results.values())
+        body = f"Repozytoria: {repo} · AUR: {aur}"
+        if partial:
+            body += "\nCzęściowy wynik — sprawdzenie jednego ze źródeł nie powiodło się."
+        subprocess.run(["notify-send", "--app-name=Aktualizacje systemu",
+                        "--icon=system-software-update", "--urgency=normal",
+                        "--expire-time=10000", f"Dostępne aktualizacje: {repo + aur}", body],
+                       stdin=subprocess.DEVNULL, check=True, timeout=15)
+    return sorted(current)
+
+
+def main():
+    if os.geteuid() == 0:
+        print("Run update-notifier as the desktop user, without sudo.", file=sys.stderr)
+        return 1
+    os.umask(0o077)
+    state_dir = Path(os.environ.get("XDG_STATE_HOME") or Path.home() / ".local/state") / "update-notifier"
+    state_dir.mkdir(parents=True, exist_ok=True)
+    state_path = state_dir / "status.json"
+    with (state_dir / "check.lock").open("a") as lock:
+        try:
+            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError:
+            return 0
+        try:
+            previous = json.loads(state_path.read_text())
+            if not isinstance(previous, dict):
+                previous = {}
+        except (OSError, ValueError):
+            previous = {}
+        with tempfile.TemporaryDirectory(prefix="update-notifier-",
+                                         dir=os.environ.get("RUNTIME_DIRECTORY")) as temporary:
+            environment = dict(os.environ, LC_ALL="C", NO_COLOR="1",
+                               CHECKUPDATES_DB=str(Path(temporary) / "database"))
+            while True:
+                before = wait_for_packages()
+                now = int(time.time())
+                results = {}
+                for name, command in (("repo", ["checkupdates", "--nocolor"]),
+                                      ("aur", ["paru", "-Qua", "--color", "never"])):
+                    old = previous.get(name, {})
+                    results[name] = scan(command, environment, old if isinstance(old, dict) else {},
+                                         now, repository=name == "repo")
+                if not Path("/var/lib/pacman/db.lck").exists() and before == package_state():
+                    break
+        status = "partial" if any(value["error"] for value in results.values()) else "ok"
+        state = {"checked_at": now, "status": status, **results,
+                 "notified": previous.get("notified", [])}
+        failed = status != "ok"
+        try:
+            state["notified"] = notify_updates(results, previous)
+        except (OSError, subprocess.SubprocessError) as error:
+            # Retry delivery on the next run; do not mark a failed notification as sent.
+            print(f"notification: {error}", file=sys.stderr)
+            failed = True
+        atomic_write(state_path, json.dumps(state, ensure_ascii=False, indent=2) + "\n")
+        print(f"repo={results['repo']['count']} aur={results['aur']['count']} status={status}")
+        for name, value in results.items():
+            if value["error"]:
+                print(f"{name}: {value['error']}", file=sys.stderr)
+        return int(failed)
+
+
+if __name__ == "__main__":
+    sys.exit(main())

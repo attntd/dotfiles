@@ -1,0 +1,10 @@
+[Unit]
+Description=Refresh update notifications after package changes
+PartOf=graphical-session.target
+
+[Path]
+PathChanged=/var/lib/pacman/local
+Unit=update-notifier.service
+
+[Install]
+WantedBy=graphical-session.target

@@ -1,5 +1,5 @@
 hl.on("hyprland.start", function()
-  hl.exec_cmd("uwsm app -- qs -n -d")
+  hl.exec_cmd("/home/attntd/.local/bin/qs")
 end)
 
 --hl.on("hyprland.start", function ()

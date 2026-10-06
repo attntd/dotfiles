@@ -60,21 +60,11 @@ end
 function M.setup(bindings)
     local bind = bindings.bind
     local main_mod = "SUPER"
-    local lock_command = os.getenv("HOME") .. "/.config/quickshell/scripts/lock-screen"
+    local lock_command = "quickshell ipc call session lock"
 
-    for _, side in ipairs({ "left", "right" }) do
-        local key = side == "left" and "Super_L" or "Super_R"
-        bind(key, hl.dsp.global("quickshell-de:workspace-switcher-" .. side), {
-            non_consuming = true,
-            ignore_mods = true,
-            transparent = true,
-            description = "[Workspace] Track Super release",
-        }, "workspace switcher " .. side)
-    end
-    bind(main_mod .. " + TAB", hl.dsp.global("quickshell-de:workspace-switcher-next"), {
-        transparent = true,
-        description = "[Workspace] Open switcher or cycle",
-    }, "cycle workspace switcher")
+    bind(main_mod .. " + TAB", hl.dsp.exec_cmd("quickshell ipc --path /home/attntd/.config/quickshell/shell.qml call bar focus"), {
+        description = "[Putkin] Focus bar",
+    }, "focus Putkin bar")
 
     local close_window_bind = bind(
         main_mod .. " + C",
@@ -90,7 +80,7 @@ function M.setup(bindings)
     bind(main_mod .. " + P", hl.dsp.window.pseudo(), { description = "[Window] Toggle pseudo-tiling" }, "toggle pseudo-tiling")
     bind(main_mod .. " + S", hl.dsp.layout("togglesplit"), { description = "[Layout] Toggle split" }, "toggle split")
 
-    bind(main_mod .. " + N", hl.dsp.exec_cmd("qs ipc call notifications toggle"), { description = "[Notifications] Toggle center" }, "toggle notification center")
+    bind(main_mod .. " + N", hl.dsp.exec_cmd("quickshell ipc --path /home/attntd/.config/quickshell/shell.qml call notifications toggle"), { description = "[Notifications] Toggle center" }, "toggle notification center")
 
     bind(main_mod .. " + SHIFT + L", hl.dsp.exec_cmd(lock_command), { description = "[Session] Lock screen" }, "lock screen")
 
@@ -143,12 +133,12 @@ function M.setup(bindings)
     bind(main_mod .. " + SHIFT + mouse:272", hl.dsp.window.drag(), { mouse = true, description = "[Mouse] Move window" }, "drag window")
     bind(main_mod .. " + mouse:273", hl.dsp.window.resize(), { mouse = true, description = "[Mouse] Resize window" }, "resize window")
 
-    bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+"), { locked = true, repeating = true, description = "[Hardware] Volume up" }, "volume up")
-    bind("XF86AudioLowerVolume", hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"), { locked = true, repeating = true, description = "[Hardware] Volume down" }, "volume down")
-    bind("XF86AudioMute", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"), { locked = true, repeating = true, description = "[Hardware] Toggle audio mute" }, "toggle audio mute")
+    bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("quickshell ipc --path /home/attntd/.config/quickshell/shell.qml call audio changeVolume 5"), { repeating = true, description = "[Hardware] Volume up" }, "volume up")
+    bind("XF86AudioLowerVolume", hl.dsp.exec_cmd("quickshell ipc --path /home/attntd/.config/quickshell/shell.qml call audio changeVolume -5"), { repeating = true, description = "[Hardware] Volume down" }, "volume down")
+    bind("XF86AudioMute", hl.dsp.exec_cmd("quickshell ipc --path /home/attntd/.config/quickshell/shell.qml call audio toggleMute"), { repeating = true, description = "[Hardware] Toggle audio mute" }, "toggle audio mute")
     bind("XF86AudioMicMute", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"), { locked = true, repeating = true, description = "[Hardware] Toggle microphone mute" }, "toggle microphone mute")
-    bind("XF86MonBrightnessUp", hl.dsp.exec_cmd("qs ipc call brightness adjust 5 || brightnessctl -e4 -n2 set 5%+"), { locked = true, repeating = true, description = "[Hardware] Brightness up" }, "brightness up")
-    bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("qs ipc call brightness adjust -5 || brightnessctl -e4 -n2 set 5%-"), { locked = true, repeating = true, description = "[Hardware] Brightness down" }, "brightness down")
+    bind("XF86MonBrightnessUp", hl.dsp.exec_cmd("quickshell ipc --path /home/attntd/.config/quickshell/shell.qml call brightness change 5"), { repeating = true, description = "[Hardware] Brightness up" }, "brightness up")
+    bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("quickshell ipc --path /home/attntd/.config/quickshell/shell.qml call brightness change -5"), { repeating = true, description = "[Hardware] Brightness down" }, "brightness down")
 
     bind("XF86AudioNext", hl.dsp.exec_cmd("playerctl next"), { locked = true, description = "[Media] Next" }, "next media")
     bind("XF86AudioPause", hl.dsp.exec_cmd("playerctl play-pause"), { locked = true, description = "[Media] Play or pause" }, "pause media")

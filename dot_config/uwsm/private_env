@@ -1,0 +1,2 @@
+export SSH_ASKPASS="$HOME/.config/quickshell/services/askpass.py"
+export SUDO_ASKPASS="$HOME/.config/quickshell/services/askpass.py"

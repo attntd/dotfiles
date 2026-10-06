@@ -1,0 +1,19 @@
+[Unit]
+Description=Impasto Quickshell (manual test session)
+PartOf=graphical-session.target
+Wants=impasto-wallpaper.service
+After=graphical-session.target impasto-wallpaper.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/quickshell --no-duplicate --path %h/.local/share/impasto/shell
+Environment=IMPASTO_SHELL_ONLY=1
+Environment=IMPASTO_TEST_SESSION=1
+Environment=IMPASTO_WALLPAPERS_DIR=%h/.local/share/impasto/wallpapers
+UnsetEnvironment=QS_CONFIG_PATH QS_CONFIG_NAME QS_MANIFEST
+# Keep applications opened from the launcher when the shell is stopped.
+KillMode=process
+SendSIGKILL=no
+TimeoutStopSec=2s
+Restart=no
+Slice=session-graphical.slice

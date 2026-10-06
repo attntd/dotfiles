@@ -28,3 +28,10 @@ auto_submit = false
 
 [text]
 smart_auto_submit = false
+
+[[mgr.prepend_keymap]]
+on   = "!"
+for  = "unix"
+run  = 'shell "$SHELL" --block'
+desc = "Otwórz powłokę tutaj"
+

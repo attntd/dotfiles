@@ -1,10 +1,19 @@
 # Dotfiles
 
 Konfiguracje użytkownika zarządzane przez chezmoi: Fish, Starship, SSH,
-Kitty, Neovim, Hyprland i osobiste ustawienia Quickshell DE.
+Kitty, Neovim, Hyprland i sesja Putkin.
 
-Kod Quickshell DE ma osobne repozytorium. Jego `scripts/install` buduje
-dodatkowe moduły i instaluje pulpit w `~/.config/quickshell`.
+Aktualny shell to Putkin ze źródeł `~/projects/putkin`, uruchamiany przez
+oficjalny pakiet `quickshell`. Autostart i skróty wskazują lokalne wydanie
+`~/.local/share/putkin/releases/20260917-settings-keyboard-cc7addc79750/`.
+Konfiguracja Hyprlanda wymaga tego wydania; samo `chezmoi apply` nie
+instaluje kodu Putkina. Szczegóły lokalnej instalacji są w
+`~/projects/putkin/docs/install.md`. Przywrócenie sesji po usunięciu end-4
+19 września 2026 zapisano również w `docs/status.md` tego projektu.
+
+Pomocniki wcześniejszego Quickshell DE w `~/.config/quickshell/scripts`
+są nadal używane przez Hypridle i SSH_ASKPASS. Ten katalog pochodzi
+z osobnej instalacji i nie jest zarządzany przez chezmoi.
 
 ## Zależności na Arch Linux
 
@@ -54,11 +63,14 @@ instalacji ani nie kopiuje tych plików do katalogu domowego.
 1. Zainstaluj Git i chezmoi oraz skonfiguruj dostęp do repo.
 2. Pobierz dotfiles przez `chezmoi init ADRES_REPO`.
 3. Uruchom instalator zależności opisany powyżej.
-4. Sklonuj osobne repo Quickshell DE do wybranego katalogu. W nim wykonaj
-   `./scripts/install`. Ekran logowania wymaga dodatkowo procedury z jego
-   `docs/greeter.md`; pakiety `greetd` same nie instalują własnego greetera.
+4. Przygotuj instalację Putkina zgodnie z jego `docs/install.md` i dopasuj
+   ścieżki wydania w konfiguracji Hyprlanda do nowego komputera. Przywróć
+   również wskazane wyżej pomocniki Hypridle i SSH_ASKPASS. Putkin ma
+   obecnie procedurę lokalnego przełączenia; przenośny instalator pozostaje
+   niewdrożony. Ekran logowania wymaga osobnego przygotowania.
 5. Dopasuj `hypr/monitors.lua` do wyjść i rozdzielczości nowego komputera.
-   Autostart uruchamia Quickshell przez `uwsm app -- qs -n -d`. Samą sesję
+   Autostart uruchamia Putkin przez `uwsm app` i `quickshell --path`
+   ze wskazaniem opublikowanego wydania. Samą sesję
    można rozpocząć z TTY poleceniem
    `uwsm start -e -D Hyprland hyprland.desktop`. Ekran logowania po restarcie
    wymaga osobnego zainstalowania i aktywowania greetera zgodnie z jego

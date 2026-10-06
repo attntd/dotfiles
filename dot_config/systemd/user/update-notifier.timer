@@ -1,0 +1,12 @@
+[Unit]
+Description=Check for updates after login and every hour
+PartOf=graphical-session.target
+
+[Timer]
+OnActiveSec=2min
+OnUnitActiveSec=1h
+RandomizedDelaySec=1min
+Unit=update-notifier.service
+
+[Install]
+WantedBy=graphical-session.target

@@ -1,0 +1,8 @@
+[Unit]
+Description=Wallpaper for the manual Impasto session
+PartOf=impasto.service graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/awww-daemon
+Slice=session-graphical.slice

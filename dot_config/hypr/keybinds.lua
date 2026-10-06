@@ -10,23 +10,21 @@ return {
     ["kitty"] = "SUPER + RETURN",
     ["zen-browser"] = "SUPER + SHIFT + RETURN",
 
+    neovim = {
+        command = "kitty -e nvim",
+        bind = "SUPER + R",
+        description = "[Apps] Neovim",
+    },
+
     file_manager = {
         command = "kitty -e fish -lc yazi",
         bind = "SUPER + E",
         description = "[Apps] Yazi file manager",
     },
 
-    app_launcher = {
-        command = "qs ipc call launcher toggle",
-        bind = "SUPER + SPACE",
-        description = "[Apps] QuickShell launcher",
-    },
+    -- Super+Spacja obsługuje config/menu-keybinds.lua Putkina.
 
-    screenshot = {
-        global = "quickshell-de:screenshot-open",
-        bind = "PRINT",
-        description = "[Screenshot] Open QuickShell capture",
-    },
+    -- Print obsługuje działanie screenshot Putkina (Ustawienia → Klawiatura).
 
     screenshot_region = {
         global = "quickshell-de:screenshot-region",
